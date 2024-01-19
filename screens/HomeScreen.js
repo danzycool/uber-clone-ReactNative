@@ -6,6 +6,7 @@ import { GOOGLE_MAPS_APIKEY } from '@env';
 
 import NavOptions from '../components/NavOptions';
 import { setDestination, setOrigin } from '../features/navSlice';
+import NavFavourites from '../components/NavFavourites';
 
 const HomeScreen = () => {
     const dispatch = useDispatch();
@@ -50,6 +51,7 @@ const HomeScreen = () => {
                     minLength={2}
                 />
                 <NavOptions />
+                <NavFavourites address="origin" />
             </View>
         </SafeAreaView>
     )

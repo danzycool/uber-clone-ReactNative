@@ -1,7 +1,7 @@
 const formatter = (num) => {
     return num.toLocaleString('en-US', {
         style: 'currency',
-        currency: 'GBP',
+        currency: 'USD',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
