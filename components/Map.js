@@ -1,38 +1,51 @@
 import { useEffect, useRef } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import MapViewDirections from 'react-native-maps-directions';
 
-import { selectOrigin, selectDestination } from '../features/navSlice';
+import { selectOrigin, selectDestination, setTravelTimeInformation } from '../features/navSlice';
 
 const Map = () => {
     const origin = useSelector(selectOrigin);
     const destination = useSelector(selectDestination);
     const mapRef = useRef(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!origin || !destination) return;
 
-        // Zoom and fit to markers
-        mapRef.current.fitToSuppliedMarkers(["origin", "destination"],
-            {
-                edgePadding: {
-                    top: 50,
-                    right: 50,
-                    bottom: 50,
-                    left: 50,
+        // Add fitToSuppliedMarkers in setTimeout to fix performance issue
+        setTimeout(() => {
+            // Zoom and fit to markers
+            mapRef.current.fitToSuppliedMarkers(["origin", "destination"],
+                {
+                    edgePadding: {
+                        top: 70,
+                        right: 50,
+                        bottom: 70,
+                        left: 50,
+                    },
+                    "animated": true,
                 },
-            },
-        );
+            );
+        }, 1000);
+
     }, [origin, destination]);
 
     useEffect(() => {
-        if (!origin || destination) return;
+        if (!origin || !destination) return;
 
         const getTravelTime = async () => {
-            const URL = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin.description}&destination=${destination.description}&key=${GOOGLE_MAPS_APIKEY}`
+            fetch(
+                `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&destinations=${destination.description}&origins=${origin.description}&key=${GOOGLE_MAPS_APIKEY}`
+            ).then((res) => res.json()
+            ).then(data => {
+                dispatch(setTravelTimeInformation(data.rows[0].elements[0]))
+            })
         }
+
+        getTravelTime();
     }, [origin, destination, GOOGLE_MAPS_APIKEY])
 
     return (
